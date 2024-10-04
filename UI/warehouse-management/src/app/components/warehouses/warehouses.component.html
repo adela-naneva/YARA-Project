@@ -1,0 +1,82 @@
+<!--TODO: present the WHs as cards, showing name, country and current capacity (in percents)-->
+<h2>
+  Warehouses
+  <span *ngIf="warehouses.length > 0">({{ warehouses.length }})</span>
+</h2>
+<div class="clr-row">
+  <div class="clr-col-2" *ngFor="let wh of warehouses">
+    <a [routerLink]="[]" (click)="selectedWH(wh)" class="card clickable">
+      <div class="card-header">{{ wh.name }}</div>
+      <div class="card-block">
+        <div class="card-title">{{ wh.country }}</div>
+        <div class="card-text">
+          <div class="progress-block">
+            <div class="progress success">
+              <progress value="{{ wh.fullness }}" max="100"></progress>
+            </div>
+            <label class="pl-half" *ngIf="wh.maxCapacity > 0">{{
+              calculatePercentage(wh.currentCapacity, wh.maxCapacity)
+            }}</label>
+          </div>
+        </div>
+      </div>
+      <div class="card-footer">
+        <button class="btn btn-sm btn-link" disabled>Edit Warehouse</button>
+      </div>
+    </a>
+  </div>
+</div>
+
+<div class="clr-row divider" *ngIf="currentWH">
+  <div class="clr-col-2">
+    <h3>{{ currentWH.name }}</h3>
+  </div>
+  <div class="clr-col-5">
+    <h3>Products</h3>
+    <div>
+      <app-import-product
+        *ngIf="currentWH"
+        [currentWarehouse]="currentWH"
+      ></app-import-product>
+      <button class="btn btn-primary" disabled>Export</button>
+    </div>
+  </div>
+  <div class="clr-col-5">
+    <h3>History</h3>
+  </div>
+</div>
+
+<div class="clr-row aligned" *ngIf="currentWH">
+  <div class="clr-col-2 left-float">
+    <div class="card">
+      <div class="card-header">More info</div>
+      <div class="card-block">
+        <div class="card-text">
+          <ul class="list list-unstyled">
+            <li>Name: {{ currentWH.name }}</li>
+            <li>Current Stock: {{ currentWH.currentCapacity }}</li>
+            <li>
+              Remaining Space:
+              {{ currentWH.maxCapacity - currentWH.currentCapacity }}
+            </li>
+            <li>Country: {{ currentWH.country }}</li>
+            <li *ngIf="currentWH.zipcode">ZipCode: {{ currentWH.zipcode }}</li>
+            <li *ngIf="currentWH.city">City: {{ currentWH.city }}</li>
+            <li *ngIf="currentWH.address">Address: {{ currentWH.address }}</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="clr-col-5 mt-half">
+    <app-current-stock
+      [currentWarehouseId]="currentWH.warehouseId"
+    ></app-current-stock>
+  </div>
+  <div class="clr-col-5 right-float">
+    <app-transaction-history
+      *ngIf="currentWH"
+      [currentWarehouseId]="currentWH.warehouseId"
+    ></app-transaction-history>
+  </div>
+</div>

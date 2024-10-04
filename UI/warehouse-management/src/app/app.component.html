@@ -1,0 +1,18 @@
+<div class="main-container">
+    <header class="header header-6">
+      <div class="branding">
+        <a routerLink="/products"> <!-- Make that to homepage -->
+          <span class="title">Warehouse Management</span>
+        </a>
+      </div>
+      <div class="header-nav">
+        <a routerLink="/products" class="nav-link nav-text">Products</a>
+        <a routerLink="/warehouses" class="nav-link nav-text">Warehouses</a>
+      </div>
+    </header>
+    <div class="content-container">
+      <div class="content-area" cds-layout="m-t:md">
+        <router-outlet/>
+      </div>
+    </div>
+  </div>

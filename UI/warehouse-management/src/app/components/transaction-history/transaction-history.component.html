@@ -1,0 +1,36 @@
+<div class="clr-row">
+  <div class="clr-col-12">
+    <!-- TODO: Add filtering and sorting on the table as well as pagination -->
+    <div class="limit-height">
+      <clr-datagrid [clrDgLoading]="loading">
+        <clr-dg-column>Type</clr-dg-column>
+        <clr-dg-column>Date</clr-dg-column>
+        <clr-dg-column>Product</clr-dg-column>
+        <clr-dg-column>Amount</clr-dg-column>
+        <clr-dg-column>Other Warehouse</clr-dg-column>
+
+        <clr-dg-placeholder>We couldn't find any history!</clr-dg-placeholder>
+
+        <clr-dg-row *ngFor="let tr of transactions">
+          <clr-dg-cell>{{ tr.type }}</clr-dg-cell>
+          <clr-dg-cell>{{ tr.creationDate | date }}</clr-dg-cell>
+          <clr-dg-cell>{{ tr.productName }}</clr-dg-cell>
+          <clr-dg-cell>{{ tr.amount | number }}</clr-dg-cell>
+          <clr-dg-cell *ngIf="tr.type == 'Import'">{{
+            tr.sourceWarehouseName ? tr.sourceWarehouseName : "N/A"
+          }}</clr-dg-cell>
+          <clr-dg-cell *ngIf="tr.type == 'Export'">{{
+            tr.targetWarehouseName ? tr.targetWarehouseName : "N/A"
+          }}</clr-dg-cell>
+        </clr-dg-row>
+
+        <clr-dg-footer *ngIf="transactions.length == 1"
+          >{{ transactions.length }} result</clr-dg-footer
+        >
+        <clr-dg-footer *ngIf="transactions.length != 1"
+          >{{ transactions.length }} results</clr-dg-footer
+        >
+      </clr-datagrid>
+    </div>
+  </div>
+</div>

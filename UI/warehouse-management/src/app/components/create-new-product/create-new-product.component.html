@@ -1,0 +1,66 @@
+<button class="btn btn-primary" (click)="openModal()">
+  Create new Product
+</button>
+
+<clr-modal
+  #modal
+  [(clrModalOpen)]="opened"
+  [clrModalSize]="'lg'"
+  [clrModalClosable]="false"
+>
+  <div class="modal-title">New Product</div>
+  <div class="modal-body">
+    <form clrForm [formGroup]="newProductForm">
+      <clr-input-container>
+        <label class="clr-required-mark">Product Name</label>
+        <input
+          clrInput
+          required
+          type="text"
+          formControlName="nameInput"
+          name="name"
+          
+        />
+        <clr-control-helper>The name of the new product</clr-control-helper>
+        <clr-control-error>This field is required!</clr-control-error>
+      </clr-input-container>
+
+      <clr-input-container>
+        <label class="clr-required-mark">Unit Size</label>
+        <input
+          clrInput
+          required
+          type="number"
+          min="1"
+          step="1"
+          formControlName="unitSizeInput"
+          name="unitSize"
+        />
+        <clr-control-helper>The size for 1 unit of the product</clr-control-helper>
+        <clr-control-error>The size is at least 1!</clr-control-error>
+      </clr-input-container>
+
+      <clr-radio-container>
+        <label>Is the product hazardous?</label>
+        <clr-radio-wrapper>
+          <input type="radio" formControlName="hazardOptions" value="true" checked="checked" clrRadio name="hazardOptions" required />
+          <label>Yes</label>
+        </clr-radio-wrapper>
+        <clr-radio-wrapper>
+          <input type="radio" formControlName="hazardOptions" value="false" clrRadio name="hazardOptions" />
+          <label>No</label>
+        </clr-radio-wrapper>
+        <clr-control-error>This field is required!</clr-control-error>
+      </clr-radio-container>
+
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline" (click)="cancel()">
+      Cancel
+    </button>
+    <button type="button" class="btn btn-primary" (click)="submit()">
+      Save
+    </button>
+  </div>
+</clr-modal>

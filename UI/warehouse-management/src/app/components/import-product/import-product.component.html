@@ -1,0 +1,150 @@
+<button class="btn btn-primary" (click)="wizardImport.open()">Import</button>
+
+<clr-wizard #wizardImport [(clrWizardOpen)]="open" [clrWizardClosable]="false">
+  <clr-wizard-title>Import</clr-wizard-title>
+
+  <clr-wizard-button [type]="'cancel'">Cancel</clr-wizard-button>
+  <clr-wizard-button [type]="'previous'">Back</clr-wizard-button>
+  <clr-wizard-button [type]="'next'">Next</clr-wizard-button>
+  <clr-wizard-button [type]="'finish'">Finish Import</clr-wizard-button>
+
+  <!-- First choose a product to import -->
+  <clr-wizard-page
+    clrWizardPagePreventDefault="true"
+    (clrWizardPageNext)="onCommitPage1()"
+    (clrWizardPageOnCancel)="doCancel()"
+  >
+    <ng-template clrPageTitle>Choose a Product</ng-template>
+    <clr-alert
+      *ngIf="!hasAnySpace"
+      [clrAlertClosable]="false"
+      [clrAlertType]="'danger'"
+    >
+      <clr-alert-item>
+        <span class="alert-text">This warehouse is out of space.</span>
+      </clr-alert-item>
+    </clr-alert>
+    <clr-datagrid
+      *ngIf="hasAnySpace"
+      #productDatagrid
+      [(clrDgSingleSelected)]="selected"
+      [clrDgItemsTrackBy]="trackProductItemById"
+    >
+      <clr-dg-column>Name</clr-dg-column>
+      <clr-dg-column>Is it Hazardous?</clr-dg-column>
+      <clr-dg-column>Unit size</clr-dg-column>
+
+      <clr-dg-row *clrDgItems="let p of allProducts" [clrDgItem]="p">
+        <clr-dg-cell>{{ p.name }}</clr-dg-cell>
+        <clr-dg-cell>{{ p.hazardous == 1 ? "Yes" : "No" }}</clr-dg-cell>
+        <clr-dg-cell>{{ p.unitSize | number }}</clr-dg-cell>
+      </clr-dg-row>
+
+      <clr-dg-footer>{{ allProducts.length }} products</clr-dg-footer>
+    </clr-datagrid>
+  </clr-wizard-page>
+
+  <!-- Show Warehouses containing the product or it is free standing -->
+  <clr-wizard-page
+    clrWizardPagePreventDefault="true"
+    (clrWizardPageNext)="onCommitPage2()"
+    (clrWizardPagePrevious)="goBack()"
+    (clrWizardPageOnCancel)="doCancel()"
+  >
+    <ng-template clrPageTitle>Warehouses</ng-template>
+    <clr-datagrid
+      #warehouseDatagrid
+      [(clrDgSingleSelected)]="selectedWarehouse"
+      [clrDgItemsTrackBy]="trackWarehouseItemById"
+    >
+      <clr-dg-column>Warehouse</clr-dg-column>
+      <clr-dg-column>Amount</clr-dg-column>
+
+      <clr-dg-row *clrDgItems="let w of warehouses" [clrDgItem]="w">
+        <clr-dg-cell>{{ w.warehouse.name }}</clr-dg-cell>
+        <clr-dg-cell>{{ w.amount | number }}</clr-dg-cell>
+      </clr-dg-row>
+    </clr-datagrid>
+    <!-- Add the logic for free standing products here -->
+  </clr-wizard-page>
+
+  <clr-wizard-page
+    *ngIf="selectedWarehouse != undefined"
+    [clrWizardPageNextDisabled]="
+      number.pristine || !amountForm.valid || !disableNext || !dateForm.valid
+    "
+    (clrWizardPageOnCancel)="doCancel()"
+    (clrWizardPagePrevious)="goBack()"
+    (clrWizardPageOnCommit)="onCommitPage3()"
+  >
+    <ng-template clrPageTitle>Manage space</ng-template>
+
+    <form #amountForm="ngForm">
+      <label
+        >Please choose the desired amount of product
+        <span *ngIf="selected">{{ selected.name }}</span></label
+      >
+      <clr-input-container>
+        <label>Amount</label>
+        <input
+          class="bit-wider"
+          clrInput
+          required
+          type="number"
+          max="{{ selectedWarehouse.amount }}"
+          min="1"
+          [(ngModel)]="number"
+          name="amountInput"
+          #number="ngModel"
+          (ngModelChange)="calculateSpace($event)"
+        />
+        <clr-control-error
+          >Selected amount should not exceed the current stock ({{
+            selectedWarehouse.amount
+          }})</clr-control-error
+        >
+      </clr-input-container>
+    </form>
+    <div>
+      <span class="label mt-half label-success"
+        >Currently available space: {{ currentlyAvalailableSpace }}</span
+      >
+    </div>
+    <div>
+      <span
+        class="label mt-half"
+        *ngIf="selectedTotalAmount <= currentlyAvalailableSpace"
+        >Selected Total Amount:
+        {{ selectedTotalAmount }}
+      </span>
+      <span
+        class="label mt-half label-danger"
+        *ngIf="selectedTotalAmount > currentlyAvalailableSpace"
+        >Selected Total Amount: {{ selectedTotalAmount }}
+      </span>
+    </div>
+
+    <form clrForm #dateForm="ngForm">
+      <clr-date-container>
+        <label>Creation Date</label>
+        <input
+          type="date"
+          autocomplete="off"
+          clrDate
+          required
+          name="creationDate"
+          [(ngModel)]="creationDate"
+        />
+      </clr-date-container>
+    </form>
+  </clr-wizard-page>
+  <clr-wizard-page
+    (clrWizardPagePrevious)="goBack()"
+    (clrWizardPageOnCancel)="doCancel()"
+  >
+    <ng-template clrPageTitle>Final</ng-template>
+    <clr-spinner *ngIf="loadingFlag">Loading</clr-spinner>
+    <h2 *ngIf="success">Success</h2>
+    <h2 *ngIf="!success">Error</h2>
+  </clr-wizard-page>
+</clr-wizard>
